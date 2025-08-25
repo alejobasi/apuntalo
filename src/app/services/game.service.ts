@@ -9,7 +9,7 @@ export class GameService {
     {
       id: 'clavito',
       name: 'clavito',
-      displayName: 'Clavito (La Pocha)',
+      displayName: 'Clavito',
       description: 'Juego de cartas tradicional español'
     }
   ];
