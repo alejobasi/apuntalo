@@ -1,0 +1,30 @@
+<div class="home-container">
+  <div class="game-selection">
+    <h2>Selecciona un juego</h2>
+
+    <div class="games-grid">
+      <div *ngFor="let game of games; let i = index" class="game-card" (click)="selectGame(game.id)"
+        [style.animation-delay]="i * 0.1 + 's'">
+
+        <h3>{{ game.displayName }}</h3>
+        <p>{{ game.description }}</p>
+
+        <div class="card-footer">
+          <span class="card-badge">Disponible</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Card para futuros juegos -->
+      <div class="game-card" style="opacity: 0.6; cursor: not-allowed;">
+        <h3>🃏 Más juegos</h3>
+        <p>Próximamente añadiremos más juegos de cartas populares como Mus, Tute, Escoba...</p>
+
+        <div class="card-footer">
+          <span class="card-badge" style="background: var(--text-muted);">Próximamente</span>
+          <span class="card-arrow">⏳</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

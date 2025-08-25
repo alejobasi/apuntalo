@@ -1,0 +1,8 @@
+<ul>
+  <li *ngFor="let player of players">{{ player }}</li>
+</ul>
+
+<input type="text" [(ngModel)]="newPlayer" placeholder="Add a new player" />
+<button (click)="addPlayer()">Add Player</button>
+
+<button *ngIf="players.length > 0" (click)="clearPlayers()">Clear Players</button>

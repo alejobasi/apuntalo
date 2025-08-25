@@ -1,0 +1,45 @@
+<div class="setup-container">
+  <div class="setup-card">
+    <div class="header">
+      <button class="back-btn" (click)="goBack()">← Volver</button>
+      <h2>{{ game?.displayName }}</h2>
+    </div>
+
+    <div class="player-input-section">
+      <h3>Añadir jugadores</h3>
+
+      <div class="input-container">
+        <input type="text" [(ngModel)]="newPlayerName" (input)="onPlayerNameInput()" (keyup.enter)="addNewPlayer()"
+          placeholder="Nombre del jugador" class="player-input">
+
+        <button (click)="addNewPlayer()" [disabled]="!newPlayerName.trim()" class="add-btn">
+          Añadir
+        </button>
+      </div>
+
+      <div *ngIf="showSuggestions" class="suggestions">
+        <div *ngFor="let suggestion of playerSuggestions" (click)="selectSuggestion(suggestion)"
+          class="suggestion-item">
+          {{ suggestion.name }} <span class="games-count">({{ suggestion.gamesPlayed }} juegos)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="players-list" *ngIf="selectedPlayers.length > 0">
+      <h3>Jugadores seleccionados ({{ selectedPlayers.length }})</h3>
+
+      <div class="player-chips">
+        <div *ngFor="let player of selectedPlayers" class="player-chip">
+          <span>{{ player.name }}</span>
+          <button (click)="removePlayer(player.id)" class="remove-btn">×</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="start-section">
+      <button (click)="startGame()" [disabled]="selectedPlayers.length < 2" class="start-btn">
+        Empezar juego (mín. 2 jugadores)
+      </button>
+    </div>
+  </div>
+</div>

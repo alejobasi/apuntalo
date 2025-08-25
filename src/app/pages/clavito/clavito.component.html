@@ -1,0 +1,142 @@
+<div class="clavito-container" *ngIf="game">
+  <!-- Header -->
+  <div class="clavito-header">
+    <button class="back-btn" (click)="goBack()">← Volver</button>
+    <h2>🎴 Clavito (La Pocha)</h2>
+  </div>
+
+  <!-- Collapsible Game Instructions -->
+  <div class="game-info-collapsible">
+    <button class="info-toggle" (click)="toggleInstructions()" [class.expanded]="showInstructions">
+      <span class="toggle-icon">{{ showInstructions ? '▼' : '▶' }}</span>
+      <span>📋 Instrucciones del juego</span>
+    </button>
+
+    <div class="game-info" [class.expanded]="showInstructions">
+      <div class="info-content">
+        <p><strong>🎯 Objetivo:</strong> Ser el último jugador en pie</p>
+        <p><strong>👆 Cómo jugar:</strong> Toca el nombre de un jugador para sumarle un punto cuando se equivoque</p>
+        <p><strong>🛡️ Pellejo:</strong> El primer jugador en llegar a 3 puntos recibe una vida extra</p>
+        <p><strong>❌ Eliminación:</strong></p>
+        <ul>
+          <li>Con pellejo: eliminado a los 4 puntos</li>
+          <li>Sin pellejo: eliminado a los 3 puntos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score Summary -->
+  <div class="score-summary" *ngIf="game.gamePhase === 'playing'">
+    <h3>📊 Resumen de Puntuación</h3>
+    <div class="summary-grid">
+      <div *ngFor="let player of game.players; trackBy: trackByPlayerId" class="summary-item"
+        [class.eliminated]="player.isEliminated" [class.pellejo]="player.hasPellejo"
+        [class.danger]="player.currentScore >= (player.hasPellejo ? 3 : 2)">
+
+        <div class="player-name">{{ player.name }}</div>
+
+        <div class="roman-score" [class.pulsing]="shouldPulse(player)">
+          <span class="roman-numerals" [attr.data-score]="player.currentScore">
+            {{ getRomanNumeral(player.currentScore) }}
+          </span>
+          <div class="score-indicator" [attr.data-level]="getScoreLevel(player)"></div>
+        </div>
+
+        <div class="player-status">
+          <span *ngIf="player.hasPellejo" class="status-badge pellejo-badge">🛡️</span>
+          <span *ngIf="player.isEliminated" class="status-badge eliminated-badge">💀</span>
+          <span *ngIf="!player.isEliminated && !player.hasPellejo" class="status-badge active-badge">✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Players (Juego) -->
+  <div class="players-section" *ngIf="getActivePlayers().length > 0">
+    <h3>🎯 Jugadores Activos ({{ getActivePlayers().length }})</h3>
+
+    <div class="players-grid">
+      <div *ngFor="let player of getActivePlayers(); trackBy: trackByPlayerId" class="player-card active-player"
+        (click)="addPoint(player.id)">
+
+        <div class="player-header">
+          <h4>{{ player.name }}</h4>
+          <span *ngIf="player.hasPellejo" class="pellejo-badge">🛡️ Pellejo</span>
+        </div>
+
+        <div class="score-display">
+          <div class="score-circles">
+            <div class="score-circle" *ngFor="let point of getScoreArray(player); let i = index"
+              [class.filled]="player.currentScore > i">
+              {{ i + 1 }}
+            </div>
+          </div>
+          <p class="score-text">
+            {{ player.currentScore }} / {{ player.hasPellejo ? 4 : 3 }} puntos
+            <span *ngIf="player.hasPellejo" class="pellejo-text">(con pellejo)</span>
+          </p>
+        </div>
+
+        <div class="player-actions" (click)="$event.stopPropagation()">
+          <button class="remove-point-btn" (click)="removePoint(player.id)" [disabled]="player.currentScore === 0"
+            title="Quitar punto">
+            -1
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eliminated Players -->
+  <div class="players-section" *ngIf="getEliminatedPlayers().length > 0">
+    <h3>❌ Jugadores Eliminados ({{ getEliminatedPlayers().length }})</h3>
+
+    <div class="eliminated-list">
+      <div *ngFor="let player of getEliminatedPlayers(); trackBy: trackByPlayerId"
+        class="player-card eliminated-player">
+
+        <div class="player-header">
+          <h4>{{ player.name }}</h4>
+          <span class="eliminated-badge">
+            Eliminado ({{ player.currentScore }} pts)
+          </span>
+        </div>
+
+        <div class="score-display">
+          <p class="score-text">
+            {{ player.currentScore }} puntos -
+            {{ player.hasPellejo ? 'Tenía pellejo' : 'Sin pellejo' }}
+          </p>
+        </div>
+
+        <div class="player-actions">
+          <button class="remove-point-btn" (click)="removePoint(player.id)" [disabled]="player.currentScore === 0"
+            title="Quitar punto (puede reactivar al jugador)">
+            -1
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Finished -->
+  <div class="winner-section" *ngIf="game.gamePhase === 'finished'">
+    <div class="winner-card">
+      <h3>🏆 ¡Juego Terminado!</h3>
+      <div class="winner-info">
+        <h2>{{ game.winner?.name }} ha ganado</h2>
+        <p>¡Felicidades por ser el último en pie!</p>
+      </div>
+      <div class="winner-actions">
+        <button class="restart-btn" (click)="resetGame()">🔄 Jugar de nuevo</button>
+        <button class="back-btn-alt" (click)="goBack()">🏠 Volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Controls -->
+  <div class="game-controls" *ngIf="game.gamePhase === 'playing'">
+    <button class="reset-btn" (click)="resetGame()">🔄 Reiniciar Juego</button>
+  </div>
+</div>

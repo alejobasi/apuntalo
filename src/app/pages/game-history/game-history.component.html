@@ -1,0 +1,17 @@
+<div>
+  <h1>Game History</h1>
+  <p>This page displays the history of past games played in Clavito.</p>
+  
+  <div *ngIf="gameHistory.length > 0; else noHistory">
+    <h2>Past Games</h2>
+    <ul>
+      <li *ngFor="let game of gameHistory">
+        <strong>{{ game.date | date:'short' }}</strong>: {{ game.players.join(', ') }} - Score: {{ game.score }}
+      </li>
+    </ul>
+  </div>
+  
+  <ng-template #noHistory>
+    <p>No game history available.</p>
+  </ng-template>
+</div>

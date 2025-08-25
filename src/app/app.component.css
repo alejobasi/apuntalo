@@ -1,0 +1,68 @@
+.app-container {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+    linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.02"><circle cx="30" cy="30" r="1"/></g></svg>');
+  pointer-events: none;
+}
+
+.app-header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  margin-bottom: 0.5rem;
+}
+
+.app-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.app-main {
+  padding: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .app-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .app-header p {
+    font-size: 1rem;
+  }
+}

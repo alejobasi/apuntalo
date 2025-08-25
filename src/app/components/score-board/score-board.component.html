@@ -1,0 +1,18 @@
+<div>
+  <h1>Score Board</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let player of players">
+        <td>{{ player.name }}</td>
+        <td>{{ player.score }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <button (click)="updateScores()">Update Scores</button>
+</div>
