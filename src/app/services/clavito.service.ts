@@ -11,7 +11,7 @@ export class ClavitoService {
     const clavitoPlayers: ClavitoPlayer[] = players.map(player => ({
       id: player.id,
       name: player.name,
-      currentScore: 0, // Usar 'currentScore'
+      currentScore: 0,
       hasPellejo: false,
       isEliminated: false,
       createdAt: player.createdAt,
@@ -22,19 +22,54 @@ export class ClavitoService {
       id: this.generateGameId(),
       players: clavitoPlayers,
       gamePhase: 'playing',
+      pellejoUsed: false,
       createdAt: new Date()
     };
+  }
+
+  addPlayerToGame (game: ClavitoGame, player: Player): ClavitoGame {
+    // Verificar que el jugador no esté ya en el juego
+    const existingPlayer = game.players.find(p => p.id === player.id);
+    if (existingPlayer) {
+      return game; // No añadir si ya existe
+    }
+
+    // Encontrar el jugador con más puntos
+    const maxScore = Math.max(...game.players.map(p => p.currentScore));
+    const playerWithMaxScore = game.players.find(p => p.currentScore === maxScore);
+
+    // Determinar puntos iniciales según la regla
+    let initialScore = maxScore;
+    if (playerWithMaxScore?.hasPellejo && maxScore >= 3) {
+      initialScore = 2; // Si el que más tiene tiene pellejo y 3+ puntos, el nuevo empieza con 2
+    }
+
+    // Crear nuevo jugador
+    const newClavitoPlayer: ClavitoPlayer = {
+      id: player.id,
+      name: player.name,
+      currentScore: initialScore,
+      hasPellejo: false,
+      isEliminated: false,
+      createdAt: player.createdAt,
+      gamesPlayed: player.gamesPlayed
+    };
+
+    // Añadir al juego
+    game.players.push(newClavitoPlayer);
+
+    // Recalcular estados
+    this.updatePlayerStatus(game);
+
+    return game;
   }
 
   addPointToPlayer (game: ClavitoGame, playerId: string): ClavitoGame {
     const player = game.players.find(p => p.id === playerId);
     if (!player || player.isEliminated) return game;
 
-    player.currentScore++; // Usar 'currentScore'
-
-    // Recalcular estados basándose en la puntuación actual
+    player.currentScore++;
     this.updatePlayerStatus(game);
-
     return game;
   }
 
@@ -42,40 +77,43 @@ export class ClavitoService {
     const player = game.players.find(p => p.id === playerId);
     if (!player || player.currentScore <= 0) return game;
 
-    player.currentScore--; // Usar 'currentScore'
-
-    // Recalcular estados basándose en la puntuación actual
+    player.currentScore--;
     this.updatePlayerStatus(game);
+    return game;
+  }
 
+  removePlayerFromGame (game: ClavitoGame, playerId: string): ClavitoGame {
+    const playerIndex = game.players.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return game;
+
+    game.players.splice(playerIndex, 1);
+    this.updatePlayerStatus(game);
     return game;
   }
 
   private updatePlayerStatus (game: ClavitoGame): void {
-    // Resetear todos los estados
+    // Solo resetear el estado de eliminación, no el pellejo
     game.players.forEach(player => {
-      player.hasPellejo = false;
       player.isEliminated = false;
     });
 
-    // Encontrar jugadores con 3 puntos exactamente (para pellejo)
-    const playersWithThreePoints = game.players.filter(p => p.currentScore === 3);
+    // Solo otorgar pellejo si nunca se ha otorgado antes
+    if (!game.pellejoUsed) {
+      const firstWithThreePoints = game.players.find(p => p.currentScore === 3);
 
-    // Si hay jugadores con exactamente 3 puntos, el primero obtiene pellejo
-    if (playersWithThreePoints.length > 0) {
-      // Ordenar por orden de llegada (puedes ajustar esta lógica según tu preferencia)
-      const firstWithThreePoints = playersWithThreePoints[0];
-      firstWithThreePoints.hasPellejo = true;
+      if (firstWithThreePoints && !firstWithThreePoints.hasPellejo) {
+        firstWithThreePoints.hasPellejo = true;
+        game.pellejoUsed = true;
+      }
     }
 
     // Aplicar lógica de eliminación
     game.players.forEach(player => {
       if (player.hasPellejo) {
-        // Con pellejo: se elimina con 4+ puntos
         if (player.currentScore >= 4) {
           player.isEliminated = true;
         }
       } else {
-        // Sin pellejo: se elimina con 3+ puntos
         if (player.currentScore >= 3) {
           player.isEliminated = true;
         }
@@ -93,7 +131,6 @@ export class ClavitoService {
       game.gamePhase = 'finished';
       game.winner = activePlayers[0];
     } else if (activePlayers.length === 0) {
-      // Caso especial: todos eliminados, el último en eliminarse gana
       const lastEliminated = game.players.reduce((latest, current) =>
         current.currentScore < latest.currentScore ? latest : current
       );
@@ -107,14 +144,14 @@ export class ClavitoService {
 
   resetGame (game: ClavitoGame): ClavitoGame {
     game.players.forEach(player => {
-      player.currentScore = 0; // Usar 'currentScore'
+      player.currentScore = 0;
       player.hasPellejo = false;
       player.isEliminated = false;
     });
 
     game.gamePhase = 'playing';
     game.winner = undefined;
-
+    game.pellejoUsed = false;
     return game;
   }
 

@@ -1,7 +1,7 @@
 export interface ClavitoPlayer {
   id: string;
   name: string;
-  currentScore: number; // Mantener 'currentScore' como está en tu modelo original
+  currentScore: number;
   hasPellejo: boolean;
   isEliminated: boolean;
   // Propiedades heredadas de Player (si las necesitas)
@@ -14,5 +14,6 @@ export interface ClavitoGame {
   players: ClavitoPlayer[];
   gamePhase: 'playing' | 'finished';
   winner?: ClavitoPlayer;
+  pellejoUsed: boolean; // Nueva propiedad para rastrear si ya se otorgó el pellejo
   createdAt: Date;
 }

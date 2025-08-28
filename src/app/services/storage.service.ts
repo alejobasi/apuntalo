@@ -70,4 +70,9 @@ export class StorageService {
       .sort((a, b) => b.gamesPlayed - a.gamesPlayed)
       .slice(0, 5);
   }
+  saveGame (gameType: string, gameData: any): void {
+    const key = `${gameType}_current_game`;
+    localStorage.setItem(key, JSON.stringify(gameData));
+  }
+
 }

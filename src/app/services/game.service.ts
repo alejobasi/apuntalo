@@ -11,6 +11,18 @@ export class GameService {
       name: 'clavito',
       displayName: 'Clavito',
       description: 'Juego de cartas tradicional español'
+    },
+    {
+      id: 'escoba',
+      name: 'escoba',
+      displayName: 'La Escoba',
+      description: 'Juego de cartas donde debes capturar cartas sumando 15'
+    },
+    {
+      id: 'chinchon',
+      name: 'chinchon',
+      displayName: 'El Chinchón',
+      description: 'Juego de cartas de escaleras y tríos'
     }
   ];
 

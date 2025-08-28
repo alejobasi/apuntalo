@@ -865,3 +865,217 @@
     margin-bottom: 0.2rem;
   }
 }
+
+/* ...existing code... */
+
+/* Add Player Section */
+.add-player-section {
+  margin-bottom: clamp(1rem, 3vw, 2rem);
+}
+
+.add-player-btn {
+  width: 100%;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+@media (min-width: 769px) {
+  .add-player-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+  }
+}
+
+.add-player-form {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.add-player-form.expanded {
+  max-height: 400px;
+  opacity: 1;
+  border-left: 4px solid var(--accent-color);
+}
+
+.form-content {
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.form-content h4 {
+  margin: 0 0 clamp(0.5rem, 2vw, 0.75rem) 0;
+  color: var(--text-primary);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+}
+
+.form-content h5 {
+  margin: clamp(1rem, 2vw, 1.5rem) 0 clamp(0.5rem, 1.5vw, 0.75rem) 0;
+  color: var(--text-secondary);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 600;
+}
+
+.entry-info {
+  background: var(--tertiary-dark);
+  color: var(--text-secondary);
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border-radius: 8px;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  border-left: 3px solid var(--accent-color);
+}
+
+.available-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.available-player-btn {
+  background: var(--secondary-dark);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  cursor: pointer;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  word-break: break-word;
+  min-height: 44px;
+}
+
+@media (min-width: 769px) {
+  .available-player-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-1px);
+  }
+}
+
+.input-group {
+  display: flex;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
+  align-items: stretch;
+}
+
+.player-name-input {
+  flex: 1;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: var(--secondary-dark);
+  color: var(--text-primary);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  min-height: 44px;
+}
+
+.player-name-input::placeholder {
+  color: var(--text-muted);
+}
+
+.player-name-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.add-btn {
+  background: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.5rem);
+  cursor: pointer;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.add-btn:disabled {
+  background: var(--tertiary-dark);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+@media (min-width: 769px) {
+  .add-btn:not(:disabled):hover {
+    background: #059669;
+    transform: translateY(-1px);
+  }
+}
+
+/* Remove Player Button in Summary */
+.summary-item {
+  position: relative;
+}
+
+.remove-player-btn {
+  position: absolute;
+  top: clamp(0.25rem, 1vw, 0.5rem);
+  right: clamp(0.25rem, 1vw, 0.5rem);
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: clamp(24px, 5vw, 28px);
+  height: clamp(24px, 5vw, 28px);
+  cursor: pointer;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 769px) {
+  .remove-player-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background: #dc2626;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .input-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .available-players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .available-player-btn {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .remove-player-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ...existing code... */

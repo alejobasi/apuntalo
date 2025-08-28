@@ -22,6 +22,47 @@
           <li>Con pellejo: eliminado a los 4 puntos</li>
           <li>Sin pellejo: eliminado a los 3 puntos</li>
         </ul>
+        <p><strong>➕ Añadir jugadores:</strong> Los nuevos jugadores entran con los mismos puntos que el líder (o 2
+          puntos si el líder tiene pellejo)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Player Section -->
+  <div class="add-player-section" *ngIf="game.gamePhase === 'playing'">
+    <button class="add-player-btn" (click)="toggleAddPlayer()">
+      {{ showAddPlayer ? '✖️ Cancelar' : '➕ Añadir Jugador' }}
+    </button>
+
+    <div class="add-player-form" [class.expanded]="showAddPlayer">
+      <div class="form-content">
+        <h4>Añadir nuevo jugador</h4>
+        <p class="entry-info">
+          El nuevo jugador entrará con: <strong>{{ getPlayerInitialScore() }}</strong>
+        </p>
+
+        <!-- Existing Players -->
+        <div class="existing-players" *ngIf="availablePlayers.length > 0">
+          <h5>Jugadores disponibles:</h5>
+          <div class="available-players-grid">
+            <button *ngFor="let player of availablePlayers" class="available-player-btn"
+              (click)="addExistingPlayer(player)">
+              {{ player.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- New Player -->
+        <div class="new-player-form">
+          <h5>O crear nuevo jugador:</h5>
+          <div class="input-group">
+            <input type="text" [(ngModel)]="newPlayerName" placeholder="Nombre del nuevo jugador"
+              class="player-name-input" (keyup.enter)="addNewPlayer()">
+            <button class="add-btn" (click)="addNewPlayer()" [disabled]="!newPlayerName.trim()">
+              Añadir
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -48,6 +89,12 @@
           <span *ngIf="player.isEliminated" class="status-badge eliminated-badge">💀</span>
           <span *ngIf="!player.isEliminated && !player.hasPellejo" class="status-badge active-badge">✓</span>
         </div>
+
+        <!-- Remove Player Button -->
+        <button *ngIf="game.players.length > 2" class="remove-player-btn" (click)="removePlayer(player.id)"
+          title="Eliminar jugador del juego">
+          🗑️
+        </button>
       </div>
     </div>
   </div>

@@ -1,0 +1,97 @@
+<div class="escoba-container">
+  <div class="header">
+    <h1>La Escoba</h1>
+    <button (click)="goHome()" class="btn btn-secondary">Volver al inicio</button>
+  </div>
+
+  <div *ngIf="!gameFinished && game" class="game-active">
+    <div class="round-info">
+      <h2>Ronda {{ game.currentRound }} de {{ game.maxRounds }}</h2>
+    </div>
+
+    <div class="scoring-section">
+      <div class="player-scores">
+        <div *ngFor="let player of players" class="player-score-card">
+          <h3>{{ player.name }}</h3>
+          <div class="score-inputs">
+            <div class="input-group">
+              <label>Cartas capturadas:</label>
+              <input type="number" [(ngModel)]="currentRoundScores[player.id].cards"
+                (ngModelChange)="calculateScore(player.id)" min="0" max="40">
+            </div>
+
+            <div class="input-group">
+              <label>Oros:</label>
+              <input type="number" [(ngModel)]="currentRoundScores[player.id].coins"
+                (ngModelChange)="calculateScore(player.id)" min="0" max="10">
+            </div>
+
+            <div class="input-group">
+              <label>Sietes:</label>
+              <input type="number" [(ngModel)]="currentRoundScores[player.id].sevens"
+                (ngModelChange)="calculateScore(player.id)" min="0" max="4">
+            </div>
+
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="currentRoundScores[player.id].sevenOfCoins"
+                  (ngModelChange)="calculateScore(player.id)">
+                Siete de Oros
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label>Escobas:</label>
+              <input type="number" [(ngModel)]="currentRoundScores[player.id].escobas"
+                (ngModelChange)="calculateScore(player.id)" min="0">
+            </div>
+
+            <div class="total-score">
+              Total ronda: {{ currentRoundScores[player.id].total || 0 }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="round-actions">
+        <button (click)="saveRound()" class="btn btn-primary">
+          {{ game.currentRound >= game.maxRounds ? 'Finalizar Juego' : 'Siguiente Ronda' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="current-totals">
+      <h3>Puntuaciones Totales</h3>
+      <div class="totals-grid">
+        <div *ngFor="let player of players" class="total-item">
+          <span>{{ player.name }}:</span>
+          <span class="total-points">{{ getPlayerTotalScore(player.id) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="gameFinished" class="game-finished">
+    <div class="winner-section">
+      <h2>¡Juego Terminado!</h2>
+      <div *ngIf="getWinner() as winner" class="winner">
+        <h3>🏆 Ganador: {{ winner.name }} 🏆</h3>
+      </div>
+    </div>
+
+    <div class="final-scores">
+      <h3>Puntuaciones Finales</h3>
+      <div class="final-scores-list">
+        <div *ngFor="let player of players" class="final-score-item">
+          <span>{{ player.name }}:</span>
+          <span class="score">{{ getPlayerTotalScore(player.id) }} puntos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-actions">
+      <button (click)="newGame()" class="btn btn-primary">Nueva Partida</button>
+      <button (click)="goHome()" class="btn btn-secondary">Volver al Inicio</button>
+    </div>
+  </div>
+</div>

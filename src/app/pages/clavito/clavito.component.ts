@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Player } from '../../models/player.model';
 import { ClavitoGame, ClavitoPlayer } from '../../models/clavito.model';
 import { ClavitoService } from '../../services/clavito.service';
+import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-clavito',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './clavito.component.html',
   styleUrls: ['./clavito.component.css']
 })
@@ -16,10 +18,14 @@ export class ClavitoComponent implements OnInit {
   game?: ClavitoGame;
   players: Player[] = [];
   showInstructions: boolean = false;
+  showAddPlayer: boolean = false;
+  newPlayerName: string = '';
+  availablePlayers: Player[] = [];
 
   constructor (
     private router: Router,
-    private clavitoService: ClavitoService
+    private clavitoService: ClavitoService,
+    private playerService: PlayerService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
@@ -34,14 +40,61 @@ export class ClavitoComponent implements OnInit {
     }
 
     this.initializeGame();
+    this.loadAvailablePlayers();
   }
 
   initializeGame (): void {
     this.game = this.clavitoService.createGame(this.players);
   }
 
+  loadAvailablePlayers (): void {
+    const allPlayers = this.playerService.getAllPlayers();
+    this.availablePlayers = allPlayers.filter(player =>
+      !this.game?.players.some(gamePlayer => gamePlayer.id === player.id)
+    );
+  }
+
   toggleInstructions (): void {
     this.showInstructions = !this.showInstructions;
+  }
+
+  toggleAddPlayer (): void {
+    this.showAddPlayer = !this.showAddPlayer;
+    if (this.showAddPlayer) {
+      this.loadAvailablePlayers();
+      this.newPlayerName = '';
+    }
+  }
+
+  addExistingPlayer (player: Player): void {
+    if (!this.game) return;
+
+    this.game = this.clavitoService.addPlayerToGame(this.game, player);
+    this.loadAvailablePlayers();
+    this.showAddPlayer = false;
+  }
+
+  addNewPlayer (): void {
+    if (!this.game || !this.newPlayerName.trim()) return;
+
+    const newPlayer = this.playerService.addPlayer(this.newPlayerName.trim());
+    this.game = this.clavitoService.addPlayerToGame(this.game, newPlayer);
+    this.loadAvailablePlayers();
+    this.newPlayerName = '';
+    this.showAddPlayer = false;
+  }
+
+  removePlayer (playerId: string): void {
+    if (!this.game) return;
+
+    const player = this.game.players.find(p => p.id === playerId);
+    if (!player) return;
+
+    const confirmed = confirm(`¿Estás seguro de que quieres eliminar a ${player.name} del juego?`);
+    if (confirmed) {
+      this.game = this.clavitoService.removePlayerFromGame(this.game, playerId);
+      this.loadAvailablePlayers();
+    }
   }
 
   addPoint (playerId: string): void {
@@ -67,20 +120,18 @@ export class ClavitoComponent implements OnInit {
     return Array.from({ length: maxPoints }, (_, i) => i + 1);
   }
 
-  // Función para convertir números a números romanos
   getRomanNumeral (score: number): string {
     const romanNumerals: { [key: number]: string } = {
-      0: '○',  // Círculo vacío para 0 puntos
+      0: '○',
       1: 'I',
       2: 'II',
       3: 'III',
       4: 'IV',
-      5: 'V'  // Por si acaso
+      5: 'V'
     };
     return romanNumerals[score] || score.toString();
   }
 
-  // Función para determinar el nivel de peligro del jugador
   getScoreLevel (player: ClavitoPlayer): string {
     const score = player.currentScore;
     const maxScore = player.hasPellejo ? 4 : 3;
@@ -97,9 +148,21 @@ export class ClavitoComponent implements OnInit {
     return 'safe';
   }
 
-  // Función para determinar si debe parpadear
   shouldPulse (player: ClavitoPlayer): boolean {
     return player.hasPellejo || player.currentScore >= 3;
+  }
+
+  getPlayerInitialScore (): string {
+    if (!this.game) return '0';
+
+    const maxScore = Math.max(...this.game.players.map(p => p.currentScore));
+    const playerWithMaxScore = this.game.players.find(p => p.currentScore === maxScore);
+
+    if (playerWithMaxScore?.hasPellejo && maxScore >= 3) {
+      return `2 (el líder tiene pellejo con ${maxScore} puntos)`;
+    }
+
+    return `${maxScore} (igualado con el líder)`;
   }
 
   resetGame (): void {
