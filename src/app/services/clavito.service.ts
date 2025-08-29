@@ -19,13 +19,14 @@ export class ClavitoService {
     }));
 
     return {
-      id: this.generateGameId(),
+      id: this.generateUUID(), // Usar UUID válido
       players: clavitoPlayers,
       gamePhase: 'playing',
       pellejoUsed: false,
       createdAt: new Date()
     };
   }
+
 
   addPlayerToGame (game: ClavitoGame, player: Player): ClavitoGame {
     // Verificar que el jugador no esté ya en el juego
@@ -159,7 +160,20 @@ export class ClavitoService {
     return game.players.filter(player => !player.isEliminated);
   }
 
+  private generateUUID (): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  // Método legacy para compatibilidad
   private generateGameId (): string {
-    return 'clavito_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return this.generateUUID();
   }
 }

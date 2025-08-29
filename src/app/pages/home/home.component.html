@@ -1,4 +1,12 @@
 <div class="home-container">
+  <!-- Header con enlace a clasificación -->
+  <div class="home-header">
+    <h1>🎮 Apúntalo</h1>
+    <a routerLink="/leaderboard" class="leaderboard-btn">
+      🏆 Clasificación
+    </a>
+  </div>
+
   <div class="game-selection">
     <h2>Selecciona un juego</h2>
 
@@ -26,5 +34,15 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Stats rápidas opcional -->
+  <div class="quick-stats">
+    <a routerLink="/leaderboard" class="stats-link">
+      <div class="stat-item">
+        <span class="stat-icon">📊</span>
+        <span class="stat-text">Ver estadísticas completas</span>
+      </div>
+    </a>
   </div>
 </div>

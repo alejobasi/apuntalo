@@ -1,0 +1,90 @@
+<div class="leaderboard-container">
+  <div class="header">
+    <h1>🏆 Clasificación</h1>
+    <p>Rankings globales de todos los jugadores</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando clasificación...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+    <button (click)="loadLeaderboard()" class="retry-btn">
+      🔄 Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="leaderboard-content">
+    <div class="stats-summary">
+      <div class="stat-card">
+        <span class="stat-number">{{ getTotalPlayers() }}</span>
+        <span class="stat-label">Jugadores</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">{{ getTotalGames() }}</span>
+        <span class="stat-label">Partidas</span>
+      </div>
+    </div>
+
+    <div class="leaderboard-table" *ngIf="playerStats.length > 0; else noData">
+      <div class="table-header">
+        <div class="col-rank">Pos.</div>
+        <div class="col-player">Jugador</div>
+        <div class="col-games">Partidas</div>
+        <div class="col-wins">Victorias</div>
+        <div class="col-percentage">% Victoria</div>
+      </div>
+
+      <div *ngFor="let player of playerStats; let i = index; trackBy: trackByPlayerId" class="table-row"
+        [class.top-3]="i < 3">
+        <div class="col-rank">
+          <span class="position">{{ getPositionEmoji(i) }}</span>
+        </div>
+
+        <div class="col-player">
+          <div class="player-info">
+            <span class="player-name">{{ player.name }}</span>
+            <span class="last-played">
+              Último juego: {{ player.lastPlayed | date:'shortDate' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-games">
+          <span class="games-count">{{ player.totalGames }}</span>
+        </div>
+
+        <div class="col-wins">
+          <span class="wins-count">{{ player.totalWins }}</span>
+        </div>
+
+        <div class="col-percentage">
+          <div class="percentage-bar">
+            <div class="percentage-fill" [style.width.%]="player.winPercentage"></div>
+            <span class="percentage-text">
+              {{ getWinPercentageDisplay(player.winPercentage) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noData>
+      <div class="no-data">
+        <h3>📊 No hay datos aún</h3>
+        <p>¡Juega algunas partidas para ver la clasificación!</p>
+        <a routerLink="/" class="start-playing-btn">
+          🎮 Empezar a jugar
+        </a>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="navigation">
+    <a routerLink="/" class="back-btn">
+      ← Volver al inicio
+    </a>
+  </div>
+</div>

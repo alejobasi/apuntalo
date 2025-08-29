@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Player } from '../../models/player.model';
+import { Player, PlayerStats } from '../../models/player.model';
 import { ClavitoGame, ClavitoPlayer } from '../../models/clavito.model';
 import { ClavitoService } from '../../services/clavito.service';
 import { PlayerService } from '../../services/player.service';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-clavito',
@@ -25,7 +26,8 @@ export class ClavitoComponent implements OnInit {
   constructor (
     private router: Router,
     private clavitoService: ClavitoService,
-    private playerService: PlayerService
+    private playerService: PlayerService,
+    private storageService: StorageService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
@@ -41,6 +43,52 @@ export class ClavitoComponent implements OnInit {
 
     this.initializeGame();
     this.loadAvailablePlayers();
+  }
+
+  async onPlayerNameInput (): Promise<void> {
+    const query = this.newPlayerName.trim();
+    if (query.length > 1) {
+      try {
+        // Intentar obtener sugerencias de la nube primero
+        const cloudSuggestions = await this.storageService.getPlayerSuggestionsFromCloud(query);
+        if (cloudSuggestions.length > 0) {
+          this.availablePlayers = cloudSuggestions.map((stats: PlayerStats) => ({
+            id: stats.id,
+            name: stats.name,
+            createdAt: stats.createdAt,
+            gamesPlayed: stats.totalGames
+          })).filter((player: Player) =>
+            !this.game?.players.some(gamePlayer => gamePlayer.id === player.id)
+          );
+        } else {
+          // Fallback a localStorage
+          this.loadAvailablePlayers();
+        }
+      } catch (error) {
+        console.error('Error getting cloud suggestions:', error);
+        // Fallback a localStorage
+        this.loadAvailablePlayers();
+      }
+    } else {
+      this.loadAvailablePlayers();
+    }
+  }
+
+  // Método para guardar el resultado cuando termine el juego
+  private async saveGameResult (): Promise<void> {
+    if (!this.game?.winner) return;
+
+    try {
+      const playerNames = this.game.players.map(p => p.name);
+      await this.storageService.saveGameResultToCloud(
+        'clavito',
+        playerNames,
+        this.game.winner.name
+      );
+    } catch (error) {
+      console.error('Error saving game result to cloud:', error);
+      // El juego continúa aunque no se pueda guardar en la nube
+    }
   }
 
   initializeGame (): void {
@@ -99,7 +147,14 @@ export class ClavitoComponent implements OnInit {
 
   addPoint (playerId: string): void {
     if (!this.game) return;
+
+    const previousPhase = this.game.gamePhase;
     this.game = this.clavitoService.addPointToPlayer(this.game, playerId);
+
+    // Si el juego acaba de terminar, guardar el resultado
+    if (previousPhase === 'playing' && this.game.gamePhase === 'finished') {
+      this.saveGameResult();
+    }
   }
 
   removePoint (playerId: string): void {
